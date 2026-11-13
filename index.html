@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dracarys FC - Fire & Blood Tactical Board</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for Image Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            overscroll-behavior-y: none;
+            touch-action: manipulation;
+            background-color: #090a0f;
+            color: #f1f5f9;
+        }
+        .player-token {
+            touch-action: none;
+            cursor: grab;
+            user-select: none;
+        }
+        .player-token:active {
+            cursor: grabbing;
+        }
+        /* Volcanic Pitch Theme */
+        .pitch-bg {
+            background: linear-gradient(180deg, #182219 0%, #1e3322 50%, #182219 100%);
+            background-size: 100px 100px;
+            background-image: 
+                linear-gradient(rgba(239, 68, 68, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(239, 68, 68, 0.04) 1px, transparent 1px);
+        }
+        .targaryen-border {
+            border-color: rgba(220, 38, 38, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-[#0f1420] border-b border-red-900/40 px-4 py-3 sticky top-0 z-30 shadow-xl">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-600 to-amber-600 flex items-center justify-center text-white font-bold shadow-lg shadow-red-900/30 border border-red-400/30">
+                        <i class="fa-solid fa-dragon text-lg"></i>
+                    </div>
+                    <div>
+                        <input type="text" id="teamNameInput" value="Dracarys" class="bg-transparent font-extrabold text-lg sm:text-xl border-b border-transparent hover:border-red-500/50 focus:border-red-500 focus:outline-none px-1 text-red-100 w-32 sm:w-36 transition tracking-wide">
+                        <span class="block text-[10px] text-amber-400/80 font-mono tracking-widest uppercase">Fire & Blood Tactics</span>
+                    </div>
+                </div>
+                <!-- Mobile Quick Actions -->
+                <div class="flex items-center gap-2 sm:hidden">
+                    <button onclick="exportImage()" class="bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-share-nodes"></i> Share
+                    </button>
+                </div>
+            </div>
+
+            <!-- Controls Toolbar -->
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
+                <!-- Size Selector -->
+                <div class="flex items-center bg-[#161d2e] rounded-lg p-1 text-xs border border-slate-800">
+                    <button onclick="changeSquadSize(5)" id="btnSize5" class="px-2.5 py-1 rounded font-medium transition text-slate-400">5v5</button>
+                    <button onclick="changeSquadSize(7)" id="btnSize7" class="px-2.5 py-1 rounded font-medium transition text-slate-400">7v7</button>
+                    <button onclick="changeSquadSize(9)" id="btnSize9" class="px-2.5 py-1 rounded font-medium transition bg-red-700 text-white shadow">9v9</button>
+                    <button onclick="changeSquadSize(11)" id="btnSize11" class="px-2.5 py-1 rounded font-medium transition text-slate-400">11v11</button>
+                </div>
+
+                <!-- Formation Selector -->
+                <select id="formationSelect" onchange="applyFormation(this.value)" class="bg-[#161d2e] border border-slate-700/80 text-xs sm:text-sm rounded-lg px-2.5 py-1.5 text-slate-200 focus:outline-none focus:border-red-500">
+                    <!-- Populated dynamically -->
+                </select>
+
+                <!-- Kit Color Picker -->
+                <div class="flex items-center gap-1.5 bg-[#161d2e] px-2 py-1 rounded-lg border border-slate-800">
+                    <span class="text-xs text-slate-400">Kit:</span>
+                    <input type="color" id="kitColor" value="#991b1b" onchange="updateKitColors()" class="w-6 h-6 rounded border-0 cursor-pointer bg-transparent" title="Kit Primary Color">
+                    <input type="color" id="kitAccentColor" value="#f59e0b" onchange="updateKitColors()" class="w-6 h-6 rounded border-0 cursor-pointer bg-transparent" title="Kit Accent Color">
+                </div>
+
+                <!-- Desktop Share Button -->
+                <button onclick="exportImage()" class="hidden sm:flex bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-3.5 py-1.5 rounded-lg text-sm font-semibold items-center gap-1.5 shadow transition">
+                    <i class="fa-solid fa-share-nodes"></i> Share / WhatsApp
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Layout -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-4 gap-4 items-start">
+        
+        <!-- Left / Top: Pitch Area -->
+        <div class="lg:col-span-3 flex flex-col items-center">
+            
+            <!-- Tactical Note Input -->
+            <div class="w-full mb-2">
+                <input type="text" id="tacticalNote" placeholder="Dracarys strategy / opponent notes..." class="w-full bg-[#111726]/90 border border-red-900/30 rounded-lg px-3 py-1.5 text-xs sm:text-sm text-slate-300 focus:outline-none focus:border-red-500">
+            </div>
+
+            <!-- Capture Container (Pitch + Header Info) -->
+            <div id="pitchCaptureArea" class="w-full bg-[#0d121f] rounded-2xl overflow-hidden border border-red-900/40 shadow-2xl relative">
+                
+                <!-- Watermark / Banner inside image capture -->
+                <div class="bg-[#131b2e] px-4 py-2.5 flex justify-between items-center border-b border-red-900/30">
+                    <div class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-dragon text-red-500 text-sm"></i>
+                        <span id="bannerTeamName" class="font-extrabold text-sm sm:text-base text-red-100 tracking-wide">Dracarys</span>
+                        <span class="text-[11px] bg-red-950/80 text-red-300 border border-red-800/50 px-2 py-0.5 rounded-full font-medium" id="bannerFormationName">9-a-side (Drogon's Charge)</span>
+                    </div>
+                    <div class="text-xs text-amber-400/90 font-mono" id="bannerDate"></div>
+                </div>
+
+                <!-- Football Pitch -->
+                <div id="footballPitch" class="pitch-bg relative w-full aspect-[4/3] sm:aspect-[16/10] overflow-hidden select-none border-b border-red-900/30">
+                    
+                    <!-- Pitch Markings (SVG Overlay with Fire Gold accents) -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-35" viewBox="0 0 1000 700" preserveAspectRatio="none">
+                        <rect x="50" y="50" width="900" height="600" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <line x1="500" y1="50" x2="500" y2="650" stroke="#f59e0b" stroke-width="2.5"/>
+                        <circle cx="500" cy="350" r="90" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <circle cx="500" cy="350" r="4" fill="#f59e0b"/>
+                        
+                        <!-- Left Penalty Box -->
+                        <rect x="50" y="200" width="160" height="300" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <rect x="50" y="275" width="60" height="150" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <circle cx="150" cy="350" r="4" fill="#f59e0b"/>
+                        <path d="M 210 290 A 90 90 0 0 1 210 410" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+
+                        <!-- Right Penalty Box -->
+                        <rect x="790" y="200" width="160" height="300" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <rect x="890" y="275" width="60" height="150" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <circle cx="850" cy="350" r="4" fill="#f59e0b"/>
+                        <path d="M 790 290 A 90 90 0 0 0 790 410" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                    </svg>
+
+                    <!-- Goal Nets Visual -->
+                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-20 border-r-2 border-y-2 border-amber-400/40 rounded-r"></div>
+                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-20 border-l-2 border-y-2 border-amber-400/40 rounded-l"></div>
+
+                    <!-- Player Tokens Container -->
+                    <div id="pitchPlayersContainer" class="absolute inset-0"></div>
+                </div>
+
+                <!-- Pitch Footer -->
+                <div class="bg-[#131b2e] px-4 py-2 flex justify-between items-center text-xs text-slate-400">
+                    <span id="displayTacticalNote" class="text-amber-400/90 italic">Dracarys Formation Active</span>
+                    <span class="font-semibold text-red-400">Dracarys FC • Fire & Blood</span>
+                </div>
+            </div>
+
+            <!-- Quick Instructions -->
+            <div class="text-xs text-slate-400 mt-2 text-center flex items-center justify-center gap-4">
+                <span><i class="fa-solid fa-arrows-up-down-left-right text-red-500"></i> Drag players anywhere on pitch</span>
+                <span><i class="fa-solid fa-pen text-red-500"></i> Click player name to edit</span>
+            </div>
+        </div>
+
+        <!-- Right / Bottom: Squad & Substitutes Bench -->
+        <div class="lg:col-span-1 flex flex-col gap-4">
+            
+            <!-- Substitutes & Squad Bench -->
+            <div class="bg-[#111726] border border-red-900/30 rounded-2xl p-3.5 shadow-lg">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-fire text-amber-500"></i> Squad Bench (<span id="squadTotalCount">18</span>)
+                    </h3>
+                    <span class="text-[11px] text-slate-400">Click arrow to swap</span>
+                </div>
+
+                <div id="benchContainer" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+                    <!-- Bench players populated dynamically from user list -->
+                </div>
+            </div>
+
+            <!-- Dragon Lore Guide -->
+            <div class="bg-[#131b2e]/60 border border-red-900/20 rounded-xl p-3 text-xs text-slate-400 space-y-1.5">
+                <div class="font-semibold text-red-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-dragon text-amber-400"></i> Dragon Formations
+                </div>
+                <p>• 9v9 presets named after legendary beasts: <strong>Drogon</strong>, <strong>Balerion</strong>, and <strong>Vhagar</strong>.</p>
+                <p>• Easily swap players between the pitch and the bench instantly.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="fixed inset-0 bg-black/85 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#131b2e] border border-red-900/50 rounded-2xl max-w-xl w-full p-5 shadow-2xl flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg text-white flex items-center gap-2">
+                    <i class="fa-solid fa-dragon text-amber-400"></i> Dracarys Tactics Exported
+                </h3>
+                <button onclick="closeShareModal()" class="text-slate-400 hover:text-white text-lg px-2">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="bg-[#090a0f] rounded-xl overflow-hidden border border-slate-800 p-2 flex justify-center">
+                <div id="modalImagePreview" class="w-full flex justify-center"></div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2 justify-end">
+                <a id="downloadLink" download="Dracarys_Formation.png" class="bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition shadow">
+                    <i class="fa-solid fa-download"></i> Download Image
+                </a>
+                <button onclick="shareToWhatsApp()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition shadow">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Share on WhatsApp
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 text-center">Download the image and drop it into your WhatsApp group chat!</p>
+        </div>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Full Squad Names provided by user (18 players)
+        const fullSquadNames = [
+            "Abhinab", "Rohan", "Sourav", "Thoi", "Amar", "Omesh", 
+            "Mayur", "Gaurav", "Sumit", "Abhijit", "Chapbou", "Anshu", 
+            "Sardar", "Rohit", "Patna", "Adhiraj", "Dhiraj", "Bishal"
+        ];
+
+        // Formations dataset for each squad size with Dragon theme names
+        const formationsData = {
+            5: {
+                "Drogon (1-2-1)": [
+                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
+                    { role: "CB", name: fullSquadNames[1], x: 35, y: 25 },
+                    { role: "CB", name: fullSquadNames[2], x: 35, y: 75 },
+                    { role: "CM", name: fullSquadNames[3], x: 60, y: 50 },
+                    { role: "ST", name: fullSquadNames[4], x: 85, y: 50 }
+                ]
+            },
+            7: {
+                "Balerion (1-3-2-1)": [
+                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
+                    { role: "LB", name: fullSquadNames[1], x: 32, y: 20 },
+                    { role: "CB", name: fullSquadNames[2], x: 28, y: 50 },
+                    { role: "RB", name: fullSquadNames[3], x: 32, y: 80 },
+                    { role: "LM", name: fullSquadNames[4], x: 60, y: 30 },
+                    { role: "RM", name: fullSquadNames[5], x: 60, y: 70 },
+                    { role: "ST", name: fullSquadNames[6], x: 85, y: 50 }
+                ]
+            },
+            9: {
+                "Drogon's Charge (1-3-3-2)": [
+                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
+                    { role: "LB", name: fullSquadNames[1], x: 32, y: 20 },
+                    { role: "CB", name: fullSquadNames[2], x: 28, y: 50 },
+                    { role: "RB", name: fullSquadNames[3], x: 32, y: 80 },
+                    { role: "LM", name: fullSquadNames[4], x: 58, y: 20 },
+                    { role: "CM", name: fullSquadNames[5], x: 52, y: 50 },
+                    { role: "RM", name: fullSquadNames[6], x: 58, y: 80 },
+                    { role: "ST", name: fullSquadNames[7], x: 82, y: 35 },
+                    { role: "ST", name: fullSquadNames[8], x: 82, y: 65 }
+                ],
+                "Balerion's Wall (1-4-3-1)": [
+                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
+                    { role: "LB", name: fullSquadNames[1], x: 30, y: 15 },
+                    { role: "CB", name: fullSquadNames[2], x: 28, y: 38 },
+                    { role: "CB", name: fullSquadNames[3], x: 28, y: 62 },
+                    { role: "RB", name: fullSquadNames[4], x: 30, y: 85 },
+                    { role: "LM", name: fullSquadNames[5], x: 60, y: 25 },
+                    { role: "CM", name: fullSquadNames[6], x: 55, y: 50 },
+                    { role: "RM", name: fullSquadNames[7], x: 60, y: 75 },
+                    { role: "ST", name: fullSquadNames[8], x: 85, y: 50 }
+                ],
+                "Vhagar's Fury (1-3-2-3)": [
+                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
+                    { role: "LB", name: fullSquadNames[1], x: 32, y: 20 },
+                    { role: "CB", name: fullSquadNames[2], x: 28, y: 50 },
+                    { role: "RB", name: fullSquadNames[3], x: 32, y: 80 },
+                    { role: "CM", name: "Central Mid 1", x: 55, y: 35 },
+                    { role: "CM", name: "Central Mid 2", x: 55, y: 65 },
+                    { role: "LW", name: fullSquadNames[4], x: 80, y: 20 },
+                    { role: "ST", name: fullSquadNames[5], x: 85, y: 50 },
+                    { role: "RW", name: fullSquadNames[6], x: 80, y: 80 }
+                ]
+            },
+            11: {
+                "Syrax (1-4-3-3)": [
+                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
+                    { role: "LB", name: fullSquadNames[1], x: 30, y: 15 },
+                    { role: "CB", name: fullSquadNames[2], x: 26, y: 38 },
+                    { role: "CB", name: fullSquadNames[3], x: 26, y: 62 },
+                    { role: "RB", name: fullSquadNames[4], x: 30, y: 85 },
+                    { role: "DM", name: fullSquadNames[5], x: 48, y: 50 },
+                    { role: "CM", name: fullSquadNames[6], x: 62, y: 32 },
+                    { role: "CM", name: fullSquadNames[7], x: 62, y: 68 },
+                    { role: "LW", name: fullSquadNames[8], x: 82, y: 20 },
+                    { role: "ST", name: fullSquadNames[9], x: 85, y: 50 },
+                    { role: "RW", name: fullSquadNames[10], x: 82, y: 80 }
+                ]
+            }
+        };
+
+        // State variables
+        let currentSquadSize = 9; // Default 9 a side
+        let currentFormationKey = "Drogon's Charge (1-3-3-2)";
+        let players = [];
+        let substitutes = [];
+
+        // Initialize App on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            document.getElementById('bannerDate').innerText = new Date().toLocaleDateString('en-US', options);
+
+            document.getElementById('teamNameInput').addEventListener('input', (e) => {
+                document.getElementById('bannerTeamName').innerText = e.target.value || 'Dracarys';
+            });
+
+            document.getElementById('tacticalNote').addEventListener('input', (e) => {
+                document.getElementById('displayTacticalNote').innerText = e.target.value ? `Dracarys Strategy: ${e.target.value}` : `Dracarys Formation Active`;
+            });
+
+            // Default to 9v9
+            changeSquadSize(9);
+        });
+
+        // Change squad size (5, 7, 9, 11)
+        function changeSquadSize(size) {
+            currentSquadSize = size;
+            
+            [5, 7, 9, 11].forEach(s => {
+                const btn = document.getElementById(`btnSize${s}`);
+                if (s === size) {
+                    btn.className = "px-2.5 py-1 rounded font-medium transition bg-red-700 text-white shadow";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded font-medium transition text-slate-400 hover:text-white";
+                }
+            });
+
+            const formationSelect = document.getElementById('formationSelect');
+            formationSelect.innerHTML = '';
+            const availableFormations = Object.keys(formationsData[size]);
+            
+            availableFormations.forEach(formKey => {
+                const opt = document.createElement('option');
+                opt.value = formKey;
+                opt.innerText = formKey;
+                formationSelect.appendChild(opt);
+            });
+
+            currentFormationKey = availableFormations[0];
+            document.getElementById('bannerFormationName').innerText = `${size}-a-side (${currentFormationKey})`;
+
+            loadFormationPlayers(currentFormationKey);
+        }
+
+        function applyFormation(formKey) {
+            currentFormationKey = formKey;
+            document.getElementById('bannerFormationName').innerText = `${currentSquadSize}-a-side (${formKey})`;
+            loadFormationPlayers(formKey);
+        }
+
+        // Load formation players and distribute remaining squad members to substitutes
+        function loadFormationPlayers(formKey) {
+            const template = formationsData[currentSquadSize][formKey];
+            
+            players = template.map((pos, idx) => ({
+                id: `p-${idx + 1}`,
+                number: idx + 1,
+                name: pos.name,
+                role: pos.role,
+                x: pos.x,
+                y: pos.y
+            }));
+
+            // Assign remaining squad members to substitutes bench
+            const assignedNames = players.map(p => p.name);
+            const remainingNames = fullSquadNames.filter(name => !assignedNames.includes(name));
+
+            substitutes = remainingNames.map((name, idx) => ({
+                id: `sub-${idx + 1}`,
+                number: players.length + idx + 1,
+                name: name,
+                position: 'SUB'
+            }));
+
+            document.getElementById('squadTotalCount').innerText = fullSquadNames.length;
+            renderPitchPlayers();
+        }
+
+        // Render players on pitch
+        function renderPitchPlayers() {
+            const container = document.getElementById('pitchPlayersContainer');
+            container.innerHTML = '';
+
+            const kitColor = document.getElementById('kitColor').value;
+            const kitAccent = document.getElementById('kitAccentColor').value;
+
+            players.forEach(p => {
+                const el = document.createElement('div');
+                el.className = 'player-token absolute flex flex-col items-center cursor-grab group';
+                el.style.left = `${p.x}%`;
+                el.style.top = `${p.y}%`;
+                el.style.transform = 'translate(-50%, -50%)';
+                el.dataset.id = p.id;
+
+                el.innerHTML = `
+                    <div class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm shadow-xl border-2 border-amber-400/80 transition transform group-hover:scale-105"
+                         style="background-color: ${kitColor}; color: ${kitAccent};">
+                        <i class="fa-solid fa-dragon absolute -inset-1 opacity-25"></i>
+                        <span class="relative z-10">${p.number}</span>
+                    </div>
+                    <div class="mt-1 bg-[#090a0f]/95 border border-red-900/50 px-2 py-0.5 rounded shadow text-center backdrop-blur-sm pointer-events-auto">
+                        <input type="text" value="${p.name}" data-id="${p.id}" class="player-name-input bg-transparent text-[10px] sm:text-xs font-bold text-amber-200 w-20 sm:w-24 text-center focus:outline-none focus:bg-[#131b2e] rounded px-1" title="Click to edit name">
+                    </div>
+                `;
+
+                setupDragAndDrop(el, p);
+                container.appendChild(el);
+            });
+
+            document.querySelectorAll('.player-name-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const id = e.target.dataset.id;
+                    const player = players.find(x => x.id === id);
+                    if (player) player.name = e.target.value;
+                });
+            });
+
+            renderBench();
+        }
+
+        // Render substitutes bench
+        function renderBench() {
+            const container = document.getElementById('benchContainer');
+            container.innerHTML = '';
+
+            if (substitutes.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-2">All squad members are on the pitch</p>`;
+                return;
+            }
+
+            substitutes.forEach((sub) => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between bg-[#161d2e] hover:bg-[#1c263b] p-2 rounded-xl border border-red-900/20 transition';
+                item.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-red-950 border border-red-800 flex items-center justify-center text-xs font-bold text-amber-300">${sub.number}</span>
+                        <input type="text" value="${sub.name}" onchange="updateSubName('${sub.id}', this.value)" class="bg-transparent text-xs text-slate-200 font-semibold focus:outline-none w-28 sm:w-36">
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="swapSubToPitch('${sub.id}')" title="Bring onto Pitch" class="bg-red-900/40 hover:bg-red-700 text-amber-300 hover:text-white px-2 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                        <button onclick="removeSub('${sub.id}')" title="Remove" class="text-slate-500 hover:text-red-400 px-1.5 py-1 rounded text-xs transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function removeSub(id) {
+            substitutes = substitutes.filter(s => s.id !== id);
+            renderBench();
+        }
+
+        function updateSubName(id, val) {
+            const sub = substitutes.find(s => s.id === id);
+            if (sub) sub.name = val;
+        }
+
+        function swapSubToPitch(subId) {
+            if (players.length === 0) return;
+            const subIndex = substitutes.findIndex(s => s.id === subId);
+            if (subIndex === -1) return;
+            const sub = substitutes[subIndex];
+
+            // Swap with first player on pitch
+            const targetPlayer = players[0];
+            substitutes[subIndex] = {
+                id: targetPlayer.id,
+                number: targetPlayer.number,
+                name: targetPlayer.name,
+                position: 'SUB'
+            };
+
+            targetPlayer.number = sub.number;
+            targetPlayer.name = sub.name;
+
+            renderPitchPlayers();
+        }
+
+        function updateKitColors() {
+            renderPitchPlayers();
+        }
+
+        // Drag and drop implementation
+        function setupDragAndDrop(element, playerObj) {
+            const pitch = document.getElementById('footballPitch');
+            let isDragging = false;
+
+            function onStart(e) {
+                isDragging = true;
+                element.style.zIndex = 50;
+                e.preventDefault();
+            }
+
+            function onMove(clientX, clientY) {
+                if (!isDragging) return;
+                const rect = pitch.getBoundingClientRect();
+                
+                let x = ((clientX - rect.left) / rect.width) * 100;
+                let y = ((clientY - rect.top) / rect.height) * 100;
+
+                x = Math.max(5, Math.min(95, x));
+                y = Math.max(5, Math.min(95, y));
+
+                playerObj.x = x;
+                playerObj.y = y;
+
+                element.style.left = `${x}%`;
+                element.style.top = `${y}%`;
+            }
+
+            function onEnd() {
+                isDragging = false;
+                element.style.zIndex = 10;
+            }
+
+            element.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) onMove(e.clientX, e.clientY);
+            });
+            window.addEventListener('mouseup', onEnd);
+
+            element.addEventListener('touchstart', (e) => {
+                onStart(e.touches[0]);
+            });
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length > 0) {
+                    onMove(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            });
+            window.addEventListener('touchend', onEnd);
+        }
+
+        // Export Image
+        function exportImage() {
+            const captureArea = document.getElementById('pitchCaptureArea');
+            const inputs = captureArea.querySelectorAll('input');
+            inputs.forEach(i => i.style.border = 'none');
+
+            html2canvas(captureArea, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#090a0f'
+            }).then(canvas => {
+                const imageURL = canvas.toDataURL('image/png');
+                
+                const previewContainer = document.getElementById('modalImagePreview');
+                previewContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = imageURL;
+                img.className = 'rounded-lg max-h-[400px] object-contain shadow-md';
+                previewContainer.appendChild(img);
+
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = imageURL;
+                downloadLink.download = `Dracarys_Formation_${currentSquadSize}v${currentSquadSize}.png`;
+
+                document.getElementById('shareModal').classList.remove('hidden');
+            });
+        }
+
+        function closeShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        function shareToWhatsApp() {
+            const teamName = document.getElementById('teamNameInput').value || 'Dracarys';
+            const note = document.getElementById('tacticalNote').value || `Formation: ${currentSquadSize}-a-side (${currentFormationKey})`;
+            const text = encodeURIComponent(`🔥 *${teamName} FC* - Fire & Blood Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}\n\nBuilt with TacticBoard FC`);
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+        }
+    </script>
+</body>
+</html>
