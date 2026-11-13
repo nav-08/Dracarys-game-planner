@@ -204,14 +204,15 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2 justify-end">
-                <a id="downloadLink" download="Dracarys_Formation.png" class="bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition shadow">
-                    <i class="fa-solid fa-download"></i> Download Image
-                </a>
-                <button onclick="shareDirectToWhatsApp()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition shadow">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> Send to WhatsApp
+                <a id="downloadLink" download="Dracarys_Formation.png" class="hidden"></a>
+                <button onclick="downloadAndCopyForWhatsApp()" class="bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition shadow">
+                    <i class="fa-solid fa-download"></i> Download Image & Copy Text
+                </button>
+                <button onclick="openWhatsAppChat()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition shadow">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Open WhatsApp
                 </button>
             </div>
-            <p class="text-xs text-slate-400 text-center">Click "Send to WhatsApp" to share the image directly, or download it to attach manually!</p>
+            <p id="copyNotice" class="text-xs text-amber-400 text-center font-medium">Image downloaded & tactical text copied! Paste it in WhatsApp and attach the image.</p>
         </div>
     </div>
 
@@ -291,7 +292,7 @@
         let substitutes = [];
         let bench = [];
         let selectedPlayer = null;
-        let lastGeneratedBlob = null;
+        let lastImageURL = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const options = { month: 'short', day: 'numeric', year: 'numeric' };
@@ -381,7 +382,6 @@
             renderSubsAndBench();
         }
 
-        // Render Pitch Players with crisp text badges (guaranteed visibility in html2canvas)
         function renderPitchPlayers() {
             const container = document.getElementById('pitchPlayersContainer');
             container.innerHTML = '';
@@ -413,7 +413,6 @@
             });
         }
 
-        // Render Substitutes & Bench lists
         function renderSubsAndBench() {
             const subsContainer = document.getElementById('subsContainer');
             subsContainer.innerHTML = '';
@@ -459,7 +458,6 @@
             });
         }
 
-        // Quick Rename Prompt
         function promptRename(id, category, event) {
             if (event) event.stopPropagation();
             const obj = findPlayerObj(id, category);
@@ -506,7 +504,6 @@
             renderPitchPlayers();
         }
 
-        // Drag and drop implementation for pitch tokens
         function setupDragAndDrop(element, playerObj) {
             const pitch = document.getElementById('footballPitch');
             let isDragging = false;
@@ -556,7 +553,6 @@
             window.addEventListener('touchend', onEnd);
         }
 
-        // Export Image via html2canvas
         function prepareAndExportImage() {
             const captureArea = document.getElementById('pitchCaptureArea');
 
@@ -565,23 +561,21 @@
                 useCORS: true,
                 backgroundColor: '#090a0f'
             }).then(canvas => {
-                canvas.toBlob(blob => {
-                    lastGeneratedBlob = blob;
-                    const imageURL = URL.createObjectURL(blob);
-                    
-                    const previewContainer = document.getElementById('modalImagePreview');
-                    previewContainer.innerHTML = '';
-                    const img = document.createElement('img');
-                    img.src = imageURL;
-                    img.className = 'rounded-lg max-h-[400px] object-contain shadow-md';
-                    previewContainer.appendChild(img);
+                const imageURL = canvas.toDataURL('image/png');
+                lastImageURL = imageURL;
+                
+                const previewContainer = document.getElementById('modalImagePreview');
+                previewContainer.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = imageURL;
+                img.className = 'rounded-lg max-h-[400px] object-contain shadow-md';
+                previewContainer.appendChild(img);
 
-                    const downloadLink = document.getElementById('downloadLink');
-                    downloadLink.href = imageURL;
-                    downloadLink.download = `Dracarys_Formation_${currentSquadSize}v${currentSquadSize}.png`;
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = imageURL;
+                downloadLink.download = `Dracarys_Formation_${currentSquadSize}v${currentSquadSize}.png`;
 
-                    document.getElementById('shareModal').classList.remove('hidden');
-                }, 'image/png');
+                document.getElementById('shareModal').classList.remove('hidden');
             }).catch(err => {
                 alert("Could not generate image. Please try again.");
             });
@@ -591,32 +585,26 @@
             document.getElementById('shareModal').classList.add('hidden');
         }
 
-        // Direct Image Share to WhatsApp using Native Web Share API
-        async function shareDirectToWhatsApp() {
+        // Automatic Download + Clipboard Text Copy
+        function downloadAndCopyForWhatsApp() {
             const teamName = document.getElementById('teamNameInput').value || 'Dracarys';
             const note = document.getElementById('tacticalNote').value || `Formation: ${currentSquadSize}-a-side (${currentFormationKey})`;
-            
-            if (navigator.canShare && lastGeneratedBlob) {
-                const file = new File([lastGeneratedBlob], 'Dracarys_Formation.png', { type: 'image/png' });
-                const shareData = {
-                    title: `${teamName} Tactics`,
-                    text: `🔥 *${teamName} FC* - Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}`,
-                    files: [file]
-                };
+            const textToCopy = `🔥 *${teamName} FC* - Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}`;
 
-                try {
-                    if (navigator.canShare(shareData)) {
-                        await navigator.share(shareData);
-                        return;
-                    }
-                } catch (err) {
-                    console.log('Share canceled or failed', err);
-                }
-            }
+            // Trigger download
+            const downloadLink = document.getElementById('downloadLink');
+            downloadLink.click();
 
-            // Fallback for desktop / browsers without file share support
-            const text = encodeURIComponent(`🔥 *${teamName} FC* - End-to-End Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}\n\n(Please download the tactical image and attach it here!)`);
-            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+            // Copy text to clipboard
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                document.getElementById('copyNotice').innerText = "✅ Image downloaded & text copied to clipboard! Open WhatsApp and paste.";
+            }).catch(() => {
+                document.getElementById('copyNotice').innerText = "✅ Image downloaded! Open WhatsApp and attach it.";
+            });
+        }
+
+        function openWhatsAppChat() {
+            window.open('https://wa.me/', '_blank');
         }
     </script>
 </body>
