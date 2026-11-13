@@ -56,7 +56,7 @@
                 </div>
                 <!-- Mobile Quick Actions -->
                 <div class="flex items-center gap-2 sm:hidden">
-                    <button onclick="exportImage()" class="bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1.5 shadow">
+                    <button onclick="prepareAndExportImage()" class="bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1.5 shadow">
                         <i class="fa-solid fa-share-nodes"></i> Share
                     </button>
                 </div>
@@ -85,7 +85,7 @@
                 </div>
 
                 <!-- Desktop Share Button -->
-                <button onclick="exportImage()" class="hidden sm:flex bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-3.5 py-1.5 rounded-lg text-sm font-semibold items-center gap-1.5 shadow transition">
+                <button onclick="prepareAndExportImage()" class="hidden sm:flex bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-3.5 py-1.5 rounded-lg text-sm font-semibold items-center gap-1.5 shadow transition">
                     <i class="fa-solid fa-share-nodes"></i> Share / WhatsApp
                 </button>
             </div>
@@ -121,11 +121,8 @@
                     
                     <!-- Vertical Pitch Markings (SVG Overlay) -->
                     <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-35" viewBox="0 0 700 950" preserveAspectRatio="none">
-                        <!-- Outer boundary -->
                         <rect x="50" y="50" width="600" height="850" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-                        <!-- Halfway line (horizontal for vertical pitch) -->
                         <line x1="50" y1="475" x2="650" y2="475" stroke="#f59e0b" stroke-width="2.5"/>
-                        <!-- Center circle -->
                         <circle cx="350" cy="475" r="85" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
                         <circle cx="350" cy="475" r="4" fill="#f59e0b"/>
                         
@@ -142,7 +139,7 @@
                         <path d="M 270 200 A 85 85 0 0 0 430 200" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
                     </svg>
 
-                    <!-- Goal Nets Visual (Top & Bottom) -->
+                    <!-- Goal Nets Visual -->
                     <div class="absolute top-0 left-1/2 -translate-x-1/2 h-3 w-20 border-b-2 border-x-2 border-amber-400/40 rounded-b"></div>
                     <div class="absolute bottom-0 left-1/2 -translate-x-1/2 h-3 w-20 border-t-2 border-x-2 border-amber-400/40 rounded-t"></div>
 
@@ -160,7 +157,7 @@
             <!-- Quick Instructions -->
             <div class="text-xs text-slate-400 mt-2 text-center flex items-center justify-center gap-4">
                 <span><i class="fa-solid fa-arrows-up-down-left-right text-red-500"></i> Drag or Click to Swap players</span>
-                <span><i class="fa-solid fa-pen text-red-500"></i> Edit names directly</span>
+                <span><i class="fa-solid fa-pen text-red-500"></i> Click any name to rename</span>
             </div>
         </div>
 
@@ -174,9 +171,7 @@
                         <i class="fa-solid fa-star text-amber-400"></i> Substitutes (4)
                     </h3>
                 </div>
-                <div id="subsContainer" class="space-y-2">
-                    <!-- Populated dynamically -->
-                </div>
+                <div id="subsContainer" class="space-y-2"></div>
             </div>
 
             <!-- Bench Box (Rest of Squad) -->
@@ -185,11 +180,9 @@
                     <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
                         <i class="fa-solid fa-users text-red-400"></i> Bench (<span id="benchCount">0</span>)
                     </h3>
-                    <span class="text-[10px] text-slate-400">Click to swap with pitch</span>
+                    <span class="text-[10px] text-slate-400">Click to swap</span>
                 </div>
-                <div id="benchContainer" class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                    <!-- Populated dynamically -->
-                </div>
+                <div id="benchContainer" class="space-y-2 max-h-[220px] overflow-y-auto pr-1"></div>
             </div>
         </div>
     </main>
@@ -214,24 +207,22 @@
                 <a id="downloadLink" download="Dracarys_Formation.png" class="bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white px-4 py-2 rounded-xl text-sm font-semibold text-center flex items-center justify-center gap-2 transition shadow">
                     <i class="fa-solid fa-download"></i> Download Image
                 </a>
-                <button onclick="shareToWhatsApp()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition shadow">
-                    <i class="fa-brands fa-whatsapp text-lg"></i> Share on WhatsApp
+                <button onclick="shareDirectToWhatsApp()" class="bg-emerald-700 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition shadow">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Send to WhatsApp
                 </button>
             </div>
-            <p class="text-xs text-slate-400 text-center">Download the image and drop it into your WhatsApp group chat!</p>
+            <p class="text-xs text-slate-400 text-center">Click "Send to WhatsApp" to share the image directly, or download it to attach manually!</p>
         </div>
     </div>
 
     <!-- JavaScript Application Logic -->
     <script>
-        // Full Squad Names provided by user (18 players)
         const fullSquadNames = [
             "Abhinab", "Rohan", "Sourav", "Thoi", "Amar", "Omesh", 
             "Mayur", "Gaurav", "Sumit", "Abhijit", "Chapbou", "Anshu", 
             "Sardar", "Rohit", "Patna", "Adhiraj", "Dhiraj", "Bishal"
         ];
 
-        // Vertical End-to-End Formations Dataset (Y runs from Defense at bottom (85%) to Attack at top (15%))
         const formationsData = {
             5: {
                 "Drogon (1-2-1)": [
@@ -294,13 +285,13 @@
             }
         };
 
-        // State variables
         let currentSquadSize = 9;
         let currentFormationKey = "Drogon's Charge (3-3-2)";
         let players = [];
-        let substitutes = []; // Exactly 4 players
-        let bench = [];      // Remaining squad members
-        let selectedPlayer = null; // For click-to-swap mechanism
+        let substitutes = [];
+        let bench = [];
+        let selectedPlayer = null;
+        let lastGeneratedBlob = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             const options = { month: 'short', day: 'numeric', year: 'numeric' };
@@ -311,7 +302,7 @@
             });
 
             document.getElementById('tacticalNote').addEventListener('input', (e) => {
-                document.getElementById('displayTacticalNote').innerText = e.target.value ? `Dracarys Strategy: ${e.target.value}` : `Dracarys End-to-End Formation Active`;
+                document.getElementById('displayTacticalNote').innerText = e.target.value ? `Strategy: ${e.target.value}` : `Dracarys Formation Active`;
             });
 
             changeSquadSize(9);
@@ -368,7 +359,6 @@
             const assignedNames = players.map(p => p.name);
             const remainingNames = fullSquadNames.filter(name => !assignedNames.includes(name));
 
-            // Exactly 4 Substitutes
             substitutes = remainingNames.slice(0, 4).map((name, idx) => ({
                 id: `sub-${idx + 1}`,
                 number: players.length + idx + 1,
@@ -376,7 +366,6 @@
                 type: 'sub'
             }));
 
-            // Rest on the bench
             bench = remainingNames.slice(4).map((name, idx) => ({
                 id: `bench-${idx + 1}`,
                 number: players.length + substitutes.length + idx + 1,
@@ -392,7 +381,7 @@
             renderSubsAndBench();
         }
 
-        // Render Pitch Players
+        // Render Pitch Players with crisp text badges (guaranteed visibility in html2canvas)
         function renderPitchPlayers() {
             const container = document.getElementById('pitchPlayersContainer');
             container.innerHTML = '';
@@ -414,27 +403,18 @@
                         <i class="fa-solid fa-dragon absolute -inset-1 opacity-25"></i>
                         <span class="relative z-10">${p.number}</span>
                     </div>
-                    <div class="mt-1 bg-[#090a0f]/95 border border-red-900/50 px-1.5 py-0.5 rounded shadow text-center backdrop-blur-sm pointer-events-auto">
-                        <input type="text" value="${p.name}" data-id="${p.id}" class="player-name-input bg-transparent text-[10px] sm:text-xs font-bold text-amber-200 w-18 sm:w-22 text-center focus:outline-none focus:bg-[#131b2e] rounded px-0.5" title="Click to edit name">
+                    <div onclick="promptRename('${p.id}', 'pitch', event)" class="mt-1 bg-[#090a0f]/95 border border-red-900/50 px-2 py-0.5 rounded shadow text-center backdrop-blur-sm pointer-events-auto cursor-pointer hover:border-amber-400 transition" title="Click to rename">
+                        <span class="text-[10px] sm:text-xs font-bold text-amber-200">${p.name}</span>
                     </div>
                 `;
 
                 setupDragAndDrop(el, p);
                 container.appendChild(el);
             });
-
-            document.querySelectorAll('.player-name-input').forEach(input => {
-                input.addEventListener('input', (e) => {
-                    const id = e.target.dataset.id;
-                    const player = players.find(x => x.id === id);
-                    if (player) player.name = e.target.value;
-                });
-            });
         }
 
         // Render Substitutes & Bench lists
         function renderSubsAndBench() {
-            // Render Substitutes (4)
             const subsContainer = document.getElementById('subsContainer');
             subsContainer.innerHTML = '';
             substitutes.forEach(sub => {
@@ -443,16 +423,16 @@
                 item.innerHTML = `
                     <div class="flex items-center gap-2" onclick="handlePlayerClick('${sub.id}', 'sub')">
                         <span class="w-6 h-6 rounded-full bg-amber-950 border border-amber-600 flex items-center justify-center text-xs font-bold text-amber-300">${sub.number}</span>
-                        <input type="text" value="${sub.name}" onchange="updatePlayerName('${sub.id}', 'sub', this.value)" class="bg-transparent text-xs text-amber-100 font-semibold focus:outline-none w-28">
+                        <span class="text-xs text-amber-100 font-semibold">${sub.name}</span>
                     </div>
-                    <button onclick="handlePlayerClick('${sub.id}', 'sub')" class="text-xs bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white px-2 py-1 rounded transition">
-                        Swap
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="promptRename('${sub.id}', 'sub', event)" class="text-[11px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="handlePlayerClick('${sub.id}', 'sub')" class="text-xs bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white px-2 py-1 rounded transition">Swap</button>
+                    </div>
                 `;
                 subsContainer.appendChild(item);
             });
 
-            // Render Bench
             const benchContainer = document.getElementById('benchContainer');
             benchContainer.innerHTML = '';
             document.getElementById('benchCount').innerText = bench.length;
@@ -468,35 +448,40 @@
                 item.innerHTML = `
                     <div class="flex items-center gap-2" onclick="handlePlayerClick('${b.id}', 'bench')">
                         <span class="w-6 h-6 rounded-full bg-red-950 border border-red-800 flex items-center justify-center text-xs font-bold text-slate-300">${b.number}</span>
-                        <input type="text" value="${b.name}" onchange="updatePlayerName('${b.id}', 'bench', this.value)" class="bg-transparent text-xs text-slate-200 font-semibold focus:outline-none w-28">
+                        <span class="text-xs text-slate-200 font-semibold">${b.name}</span>
                     </div>
-                    <button onclick="handlePlayerClick('${b.id}', 'bench')" class="text-xs bg-red-900/30 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded transition">
-                        Swap
-                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="promptRename('${b.id}', 'bench', event)" class="text-[11px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded" title="Rename"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="handlePlayerClick('${b.id}', 'bench')" class="text-xs bg-red-900/30 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded transition">Swap</button>
+                    </div>
                 `;
                 benchContainer.appendChild(item);
             });
         }
 
-        // Click-to-Swap Mechanism between Pitch, Subs, and Bench
-        function handlePlayerClick(id, category) {
-            let clickedPlayer = null;
-            if (category === 'pitch') clickedPlayer = players.find(p => p.id === id);
-            else if (category === 'sub') clickedPlayer = substitutes.find(s => s.id === id);
-            else if (category === 'bench') clickedPlayer = bench.find(b => b.id === id);
+        // Quick Rename Prompt
+        function promptRename(id, category, event) {
+            if (event) event.stopPropagation();
+            const obj = findPlayerObj(id, category);
+            if (!obj) return;
+            const newName = prompt(`Rename player:`, obj.name);
+            if (newName && newName.trim() !== '') {
+                obj.name = newName.trim();
+                renderAll();
+            }
+        }
 
+        function handlePlayerClick(id, category) {
+            let clickedPlayer = findPlayerObj(id, category);
             if (!selectedPlayer) {
                 selectedPlayer = { ...clickedPlayer, category };
                 renderAll();
             } else {
                 if (selectedPlayer.id === clickedPlayer.id) {
-                    // Deselect if clicked again
                     selectedPlayer = null;
                     renderAll();
                     return;
                 }
-
-                // Perform Swap of Names & Roles (keeping positions & numbers fixed)
                 let sourceObj = findPlayerObj(selectedPlayer.id, selectedPlayer.category);
                 let targetObj = findPlayerObj(clickedPlayer.id, category);
 
@@ -505,7 +490,6 @@
                     sourceObj.name = targetObj.name;
                     targetObj.name = tempName;
                 }
-
                 selectedPlayer = null;
                 renderAll();
             }
@@ -516,11 +500,6 @@
             if (category === 'sub') return substitutes.find(s => s.id === id);
             if (category === 'bench') return bench.find(b => b.id === id);
             return null;
-        }
-
-        function updatePlayerName(id, category, val) {
-            const obj = findPlayerObj(id, category);
-            if (obj) obj.name = val;
         }
 
         function updateKitColors() {
@@ -577,31 +556,34 @@
             window.addEventListener('touchend', onEnd);
         }
 
-        // Export Image
-        function exportImage() {
+        // Export Image via html2canvas
+        function prepareAndExportImage() {
             const captureArea = document.getElementById('pitchCaptureArea');
-            const inputs = captureArea.querySelectorAll('input');
-            inputs.forEach(i => i.style.border = 'none');
 
             html2canvas(captureArea, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: '#090a0f'
             }).then(canvas => {
-                const imageURL = canvas.toDataURL('image/png');
-                
-                const previewContainer = document.getElementById('modalImagePreview');
-                previewContainer.innerHTML = '';
-                const img = document.createElement('img');
-                img.src = imageURL;
-                img.className = 'rounded-lg max-h-[400px] object-contain shadow-md';
-                previewContainer.appendChild(img);
+                canvas.toBlob(blob => {
+                    lastGeneratedBlob = blob;
+                    const imageURL = URL.createObjectURL(blob);
+                    
+                    const previewContainer = document.getElementById('modalImagePreview');
+                    previewContainer.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = imageURL;
+                    img.className = 'rounded-lg max-h-[400px] object-contain shadow-md';
+                    previewContainer.appendChild(img);
 
-                const downloadLink = document.getElementById('downloadLink');
-                downloadLink.href = imageURL;
-                downloadLink.download = `Dracarys_Formation_${currentSquadSize}v${currentSquadSize}.png`;
+                    const downloadLink = document.getElementById('downloadLink');
+                    downloadLink.href = imageURL;
+                    downloadLink.download = `Dracarys_Formation_${currentSquadSize}v${currentSquadSize}.png`;
 
-                document.getElementById('shareModal').classList.remove('hidden');
+                    document.getElementById('shareModal').classList.remove('hidden');
+                }, 'image/png');
+            }).catch(err => {
+                alert("Could not generate image. Please try again.");
             });
         }
 
@@ -609,10 +591,31 @@
             document.getElementById('shareModal').classList.add('hidden');
         }
 
-        function shareToWhatsApp() {
+        // Direct Image Share to WhatsApp using Native Web Share API
+        async function shareDirectToWhatsApp() {
             const teamName = document.getElementById('teamNameInput').value || 'Dracarys';
             const note = document.getElementById('tacticalNote').value || `Formation: ${currentSquadSize}-a-side (${currentFormationKey})`;
-            const text = encodeURIComponent(`🔥 *${teamName} FC* - End-to-End Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}\n\nBuilt with TacticBoard FC`);
+            
+            if (navigator.canShare && lastGeneratedBlob) {
+                const file = new File([lastGeneratedBlob], 'Dracarys_Formation.png', { type: 'image/png' });
+                const shareData = {
+                    title: `${teamName} Tactics`,
+                    text: `🔥 *${teamName} FC* - Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}`,
+                    files: [file]
+                };
+
+                try {
+                    if (navigator.canShare(shareData)) {
+                        await navigator.share(shareData);
+                        return;
+                    }
+                } catch (err) {
+                    console.log('Share canceled or failed', err);
+                }
+            }
+
+            // Fallback for desktop / browsers without file share support
+            const text = encodeURIComponent(`🔥 *${teamName} FC* - End-to-End Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}\n\n(Please download the tactical image and attach it here!)`);
             window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         }
     </script>
