@@ -25,7 +25,7 @@
         .player-token:active {
             cursor: grabbing;
         }
-        /* Volcanic Pitch Theme */
+        /* Vertical End-to-End Pitch Theme */
         .pitch-bg {
             background: linear-gradient(180deg, #182219 0%, #1e3322 50%, #182219 100%);
             background-size: 100px 100px;
@@ -33,8 +33,9 @@
                 linear-gradient(rgba(239, 68, 68, 0.04) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(239, 68, 68, 0.04) 1px, transparent 1px);
         }
-        .targaryen-border {
-            border-color: rgba(220, 38, 38, 0.4);
+        .selected-token {
+            box-shadow: 0 0 0 4px #f59e0b, 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            transform: scale(1.1);
         }
     </style>
 </head>
@@ -110,37 +111,40 @@
                     <div class="flex items-center gap-2.5">
                         <i class="fa-solid fa-dragon text-red-500 text-sm"></i>
                         <span id="bannerTeamName" class="font-extrabold text-sm sm:text-base text-red-100 tracking-wide">Dracarys</span>
-                        <span class="text-[11px] bg-red-950/80 text-red-300 border border-red-800/50 px-2 py-0.5 rounded-full font-medium" id="bannerFormationName">9-a-side (Drogon's Charge)</span>
+                        <span class="text-[11px] bg-red-950/80 text-red-300 border border-red-800/50 px-2 py-0.5 rounded-full font-medium" id="bannerFormationName">9-a-side</span>
                     </div>
                     <div class="text-xs text-amber-400/90 font-mono" id="bannerDate"></div>
                 </div>
 
-                <!-- Football Pitch -->
-                <div id="footballPitch" class="pitch-bg relative w-full aspect-[4/3] sm:aspect-[16/10] overflow-hidden select-none border-b border-red-900/30">
+                <!-- Vertical End-to-End Football Pitch -->
+                <div id="footballPitch" class="pitch-bg relative w-full aspect-[3/4] sm:aspect-[3/4] max-w-[550px] mx-auto overflow-hidden select-none border-b border-red-900/30">
                     
-                    <!-- Pitch Markings (SVG Overlay with Fire Gold accents) -->
-                    <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-35" viewBox="0 0 1000 700" preserveAspectRatio="none">
-                        <rect x="50" y="50" width="900" height="600" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-                        <line x1="500" y1="50" x2="500" y2="650" stroke="#f59e0b" stroke-width="2.5"/>
-                        <circle cx="500" cy="350" r="90" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-                        <circle cx="500" cy="350" r="4" fill="#f59e0b"/>
+                    <!-- Vertical Pitch Markings (SVG Overlay) -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none opacity-35" viewBox="0 0 700 950" preserveAspectRatio="none">
+                        <!-- Outer boundary -->
+                        <rect x="50" y="50" width="600" height="850" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <!-- Halfway line (horizontal for vertical pitch) -->
+                        <line x1="50" y1="475" x2="650" y2="475" stroke="#f59e0b" stroke-width="2.5"/>
+                        <!-- Center circle -->
+                        <circle cx="350" cy="475" r="85" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <circle cx="350" cy="475" r="4" fill="#f59e0b"/>
                         
-                        <!-- Left Penalty Box -->
-                        <rect x="50" y="200" width="160" height="300" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-                        <rect x="50" y="275" width="60" height="150" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-                        <circle cx="150" cy="350" r="4" fill="#f59e0b"/>
-                        <path d="M 210 290 A 90 90 0 0 1 210 410" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <!-- Bottom Penalty Box (Defense) -->
+                        <rect x="200" y="750" width="300" height="150" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <rect x="260" y="840" width="180" height="60" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <circle cx="350" cy="830" r="4" fill="#f59e0b"/>
+                        <path d="M 270 750 A 85 85 0 0 0 430 750" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
 
-                        <!-- Right Penalty Box -->
-                        <rect x="790" y="200" width="160" height="300" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-                        <rect x="890" y="275" width="60" height="150" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
-                        <circle cx="850" cy="350" r="4" fill="#f59e0b"/>
-                        <path d="M 790 290 A 90 90 0 0 0 790 410" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <!-- Top Penalty Box (Attack) -->
+                        <rect x="200" y="50" width="300" height="150" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <rect x="260" y="50" width="180" height="60" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+                        <circle cx="350" cy="120" r="4" fill="#f59e0b"/>
+                        <path d="M 270 200 A 85 85 0 0 0 430 200" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
                     </svg>
 
-                    <!-- Goal Nets Visual -->
-                    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-3 h-20 border-r-2 border-y-2 border-amber-400/40 rounded-r"></div>
-                    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-20 border-l-2 border-y-2 border-amber-400/40 rounded-l"></div>
+                    <!-- Goal Nets Visual (Top & Bottom) -->
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 h-3 w-20 border-b-2 border-x-2 border-amber-400/40 rounded-b"></div>
+                    <div class="absolute bottom-0 left-1/2 -translate-x-1/2 h-3 w-20 border-t-2 border-x-2 border-amber-400/40 rounded-t"></div>
 
                     <!-- Player Tokens Container -->
                     <div id="pitchPlayersContainer" class="absolute inset-0"></div>
@@ -149,41 +153,43 @@
                 <!-- Pitch Footer -->
                 <div class="bg-[#131b2e] px-4 py-2 flex justify-between items-center text-xs text-slate-400">
                     <span id="displayTacticalNote" class="text-amber-400/90 italic">Dracarys Formation Active</span>
-                    <span class="font-semibold text-red-400">Dracarys FC • Fire & Blood</span>
+                    <span class="font-semibold text-red-400">Dracarys FC • End-to-End</span>
                 </div>
             </div>
 
             <!-- Quick Instructions -->
             <div class="text-xs text-slate-400 mt-2 text-center flex items-center justify-center gap-4">
-                <span><i class="fa-solid fa-arrows-up-down-left-right text-red-500"></i> Drag players anywhere on pitch</span>
-                <span><i class="fa-solid fa-pen text-red-500"></i> Click player name to edit</span>
+                <span><i class="fa-solid fa-arrows-up-down-left-right text-red-500"></i> Drag or Click to Swap players</span>
+                <span><i class="fa-solid fa-pen text-red-500"></i> Edit names directly</span>
             </div>
         </div>
 
-        <!-- Right / Bottom: Squad & Substitutes Bench -->
+        <!-- Right / Bottom: Substitutes & Bench -->
         <div class="lg:col-span-1 flex flex-col gap-4">
             
-            <!-- Substitutes & Squad Bench -->
-            <div class="bg-[#111726] border border-red-900/30 rounded-2xl p-3.5 shadow-lg">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
-                        <i class="fa-solid fa-fire text-amber-500"></i> Squad Bench (<span id="squadTotalCount">18</span>)
+            <!-- Substitutes Box (Exactly 4) -->
+            <div class="bg-[#111726] border border-amber-500/30 rounded-2xl p-3.5 shadow-lg">
+                <div class="flex justify-between items-center mb-2.5">
+                    <h3 class="font-bold text-sm text-amber-200 flex items-center gap-2">
+                        <i class="fa-solid fa-star text-amber-400"></i> Substitutes (4)
                     </h3>
-                    <span class="text-[11px] text-slate-400">Click arrow to swap</span>
                 </div>
-
-                <div id="benchContainer" class="space-y-2 max-h-[360px] overflow-y-auto pr-1">
-                    <!-- Bench players populated dynamically from user list -->
+                <div id="subsContainer" class="space-y-2">
+                    <!-- Populated dynamically -->
                 </div>
             </div>
 
-            <!-- Dragon Lore Guide -->
-            <div class="bg-[#131b2e]/60 border border-red-900/20 rounded-xl p-3 text-xs text-slate-400 space-y-1.5">
-                <div class="font-semibold text-red-400 flex items-center gap-1.5">
-                    <i class="fa-solid fa-dragon text-amber-400"></i> Dragon Formations
+            <!-- Bench Box (Rest of Squad) -->
+            <div class="bg-[#111726] border border-red-900/30 rounded-2xl p-3.5 shadow-lg">
+                <div class="flex justify-between items-center mb-2.5">
+                    <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-red-400"></i> Bench (<span id="benchCount">0</span>)
+                    </h3>
+                    <span class="text-[10px] text-slate-400">Click to swap with pitch</span>
                 </div>
-                <p>• 9v9 presets named after legendary beasts: <strong>Drogon</strong>, <strong>Balerion</strong>, and <strong>Vhagar</strong>.</p>
-                <p>• Easily swap players between the pitch and the bench instantly.</p>
+                <div id="benchContainer" class="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                    <!-- Populated dynamically -->
+                </div>
             </div>
         </div>
     </main>
@@ -225,87 +231,77 @@
             "Sardar", "Rohit", "Patna", "Adhiraj", "Dhiraj", "Bishal"
         ];
 
-        // Formations dataset for each squad size with Dragon theme names
+        // Vertical End-to-End Formations Dataset (Y runs from Defense at bottom (85%) to Attack at top (15%))
         const formationsData = {
             5: {
                 "Drogon (1-2-1)": [
-                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
-                    { role: "CB", name: fullSquadNames[1], x: 35, y: 25 },
-                    { role: "CB", name: fullSquadNames[2], x: 35, y: 75 },
-                    { role: "CM", name: fullSquadNames[3], x: 60, y: 50 },
-                    { role: "ST", name: fullSquadNames[4], x: 85, y: 50 }
+                    { role: "GK", name: fullSquadNames[0], x: 50, y: 88 },
+                    { role: "CB", name: fullSquadNames[1], x: 30, y: 68 },
+                    { role: "CB", name: fullSquadNames[2], x: 70, y: 68 },
+                    { role: "CM", name: fullSquadNames[3], x: 50, y: 45 },
+                    { role: "ST", name: fullSquadNames[4], x: 50, y: 20 }
                 ]
             },
             7: {
                 "Balerion (1-3-2-1)": [
-                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
-                    { role: "LB", name: fullSquadNames[1], x: 32, y: 20 },
-                    { role: "CB", name: fullSquadNames[2], x: 28, y: 50 },
-                    { role: "RB", name: fullSquadNames[3], x: 32, y: 80 },
-                    { role: "LM", name: fullSquadNames[4], x: 60, y: 30 },
-                    { role: "RM", name: fullSquadNames[5], x: 60, y: 70 },
-                    { role: "ST", name: fullSquadNames[6], x: 85, y: 50 }
+                    { role: "GK", name: fullSquadNames[0], x: 50, y: 88 },
+                    { role: "LB", name: fullSquadNames[1], x: 20, y: 70 },
+                    { role: "CB", name: fullSquadNames[2], x: 50, y: 75 },
+                    { role: "RB", name: fullSquadNames[3], x: 80, y: 70 },
+                    { role: "LM", name: fullSquadNames[4], x: 30, y: 45 },
+                    { role: "RM", name: fullSquadNames[5], x: 70, y: 45 },
+                    { role: "ST", name: fullSquadNames[6], x: 50, y: 20 }
                 ]
             },
             9: {
-                "Drogon's Charge (1-3-3-2)": [
-                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
-                    { role: "LB", name: fullSquadNames[1], x: 32, y: 20 },
-                    { role: "CB", name: fullSquadNames[2], x: 28, y: 50 },
-                    { role: "RB", name: fullSquadNames[3], x: 32, y: 80 },
-                    { role: "LM", name: fullSquadNames[4], x: 58, y: 20 },
-                    { role: "CM", name: fullSquadNames[5], x: 52, y: 50 },
-                    { role: "RM", name: fullSquadNames[6], x: 58, y: 80 },
-                    { role: "ST", name: fullSquadNames[7], x: 82, y: 35 },
-                    { role: "ST", name: fullSquadNames[8], x: 82, y: 65 }
+                "Drogon's Charge (3-3-2)": [
+                    { role: "GK", name: fullSquadNames[0], x: 50, y: 88 },
+                    { role: "LB", name: fullSquadNames[1], x: 22, y: 70 },
+                    { role: "CB", name: fullSquadNames[2], x: 50, y: 75 },
+                    { role: "RB", name: fullSquadNames[3], x: 78, y: 70 },
+                    { role: "LM", name: fullSquadNames[4], x: 22, y: 45 },
+                    { role: "CM", name: fullSquadNames[5], x: 50, y: 48 },
+                    { role: "RM", name: fullSquadNames[6], x: 78, y: 45 },
+                    { role: "ST", name: fullSquadNames[7], x: 35, y: 22 },
+                    { role: "ST", name: fullSquadNames[8], x: 65, y: 22 }
                 ],
-                "Balerion's Wall (1-4-3-1)": [
-                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
-                    { role: "LB", name: fullSquadNames[1], x: 30, y: 15 },
-                    { role: "CB", name: fullSquadNames[2], x: 28, y: 38 },
-                    { role: "CB", name: fullSquadNames[3], x: 28, y: 62 },
-                    { role: "RB", name: fullSquadNames[4], x: 30, y: 85 },
-                    { role: "LM", name: fullSquadNames[5], x: 60, y: 25 },
-                    { role: "CM", name: fullSquadNames[6], x: 55, y: 50 },
-                    { role: "RM", name: fullSquadNames[7], x: 60, y: 75 },
-                    { role: "ST", name: fullSquadNames[8], x: 85, y: 50 }
-                ],
-                "Vhagar's Fury (1-3-2-3)": [
-                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
-                    { role: "LB", name: fullSquadNames[1], x: 32, y: 20 },
-                    { role: "CB", name: fullSquadNames[2], x: 28, y: 50 },
-                    { role: "RB", name: fullSquadNames[3], x: 32, y: 80 },
-                    { role: "CM", name: "Central Mid 1", x: 55, y: 35 },
-                    { role: "CM", name: "Central Mid 2", x: 55, y: 65 },
-                    { role: "LW", name: fullSquadNames[4], x: 80, y: 20 },
-                    { role: "ST", name: fullSquadNames[5], x: 85, y: 50 },
-                    { role: "RW", name: fullSquadNames[6], x: 80, y: 80 }
+                "Balerion's Wall (4-3-1)": [
+                    { role: "GK", name: fullSquadNames[0], x: 50, y: 88 },
+                    { role: "LB", name: fullSquadNames[1], x: 18, y: 70 },
+                    { role: "CB", name: fullSquadNames[2], x: 38, y: 75 },
+                    { role: "CB", name: fullSquadNames[3], x: 62, y: 75 },
+                    { role: "RB", name: fullSquadNames[4], x: 82, y: 70 },
+                    { role: "LM", name: fullSquadNames[5], x: 25, y: 45 },
+                    { role: "CM", name: fullSquadNames[6], x: 50, y: 48 },
+                    { role: "RM", name: fullSquadNames[7], x: 75, y: 45 },
+                    { role: "ST", name: fullSquadNames[8], x: 50, y: 22 }
                 ]
             },
             11: {
-                "Syrax (1-4-3-3)": [
-                    { role: "GK", name: fullSquadNames[0], x: 10, y: 50 },
-                    { role: "LB", name: fullSquadNames[1], x: 30, y: 15 },
-                    { role: "CB", name: fullSquadNames[2], x: 26, y: 38 },
-                    { role: "CB", name: fullSquadNames[3], x: 26, y: 62 },
-                    { role: "RB", name: fullSquadNames[4], x: 30, y: 85 },
-                    { role: "DM", name: fullSquadNames[5], x: 48, y: 50 },
-                    { role: "CM", name: fullSquadNames[6], x: 62, y: 32 },
-                    { role: "CM", name: fullSquadNames[7], x: 62, y: 68 },
-                    { role: "LW", name: fullSquadNames[8], x: 82, y: 20 },
-                    { role: "ST", name: fullSquadNames[9], x: 85, y: 50 },
-                    { role: "RW", name: fullSquadNames[10], x: 82, y: 80 }
+                "Syrax (4-3-3)": [
+                    { role: "GK", name: fullSquadNames[0], x: 50, y: 88 },
+                    { role: "LB", name: fullSquadNames[1], x: 18, y: 72 },
+                    { role: "CB", name: fullSquadNames[2], x: 38, y: 76 },
+                    { role: "CB", name: fullSquadNames[3], x: 62, y: 76 },
+                    { role: "RB", name: fullSquadNames[4], x: 82, y: 72 },
+                    { role: "DM", name: fullSquadNames[5], x: 50, y: 56 },
+                    { role: "CM", name: fullSquadNames[6], x: 32, y: 42 },
+                    { role: "CM", name: fullSquadNames[7], x: 68, y: 42 },
+                    { role: "LW", name: fullSquadNames[8], x: 22, y: 22 },
+                    { role: "ST", name: fullSquadNames[9], x: 50, y: 18 },
+                    { role: "RW", name: fullSquadNames[10], x: 78, y: 22 }
                 ]
             }
         };
 
         // State variables
-        let currentSquadSize = 9; // Default 9 a side
-        let currentFormationKey = "Drogon's Charge (1-3-3-2)";
+        let currentSquadSize = 9;
+        let currentFormationKey = "Drogon's Charge (3-3-2)";
         let players = [];
-        let substitutes = [];
+        let substitutes = []; // Exactly 4 players
+        let bench = [];      // Remaining squad members
+        let selectedPlayer = null; // For click-to-swap mechanism
 
-        // Initialize App on load
         window.addEventListener('DOMContentLoaded', () => {
             const options = { month: 'short', day: 'numeric', year: 'numeric' };
             document.getElementById('bannerDate').innerText = new Date().toLocaleDateString('en-US', options);
@@ -315,14 +311,12 @@
             });
 
             document.getElementById('tacticalNote').addEventListener('input', (e) => {
-                document.getElementById('displayTacticalNote').innerText = e.target.value ? `Dracarys Strategy: ${e.target.value}` : `Dracarys Formation Active`;
+                document.getElementById('displayTacticalNote').innerText = e.target.value ? `Dracarys Strategy: ${e.target.value}` : `Dracarys End-to-End Formation Active`;
             });
 
-            // Default to 9v9
             changeSquadSize(9);
         });
 
-        // Change squad size (5, 7, 9, 11)
         function changeSquadSize(size) {
             currentSquadSize = size;
             
@@ -358,7 +352,6 @@
             loadFormationPlayers(formKey);
         }
 
-        // Load formation players and distribute remaining squad members to substitutes
         function loadFormationPlayers(formKey) {
             const template = formationsData[currentSquadSize][formKey];
             
@@ -368,25 +361,38 @@
                 name: pos.name,
                 role: pos.role,
                 x: pos.x,
-                y: pos.y
+                y: pos.y,
+                type: 'pitch'
             }));
 
-            // Assign remaining squad members to substitutes bench
             const assignedNames = players.map(p => p.name);
             const remainingNames = fullSquadNames.filter(name => !assignedNames.includes(name));
 
-            substitutes = remainingNames.map((name, idx) => ({
+            // Exactly 4 Substitutes
+            substitutes = remainingNames.slice(0, 4).map((name, idx) => ({
                 id: `sub-${idx + 1}`,
                 number: players.length + idx + 1,
                 name: name,
-                position: 'SUB'
+                type: 'sub'
             }));
 
-            document.getElementById('squadTotalCount').innerText = fullSquadNames.length;
-            renderPitchPlayers();
+            // Rest on the bench
+            bench = remainingNames.slice(4).map((name, idx) => ({
+                id: `bench-${idx + 1}`,
+                number: players.length + substitutes.length + idx + 1,
+                name: name,
+                type: 'bench'
+            }));
+
+            renderAll();
         }
 
-        // Render players on pitch
+        function renderAll() {
+            renderPitchPlayers();
+            renderSubsAndBench();
+        }
+
+        // Render Pitch Players
         function renderPitchPlayers() {
             const container = document.getElementById('pitchPlayersContainer');
             container.innerHTML = '';
@@ -396,20 +402,20 @@
 
             players.forEach(p => {
                 const el = document.createElement('div');
-                el.className = 'player-token absolute flex flex-col items-center cursor-grab group';
+                el.className = `player-token absolute flex flex-col items-center cursor-grab group ${selectedPlayer?.id === p.id ? 'selected-token z-40' : 'z-10'}`;
                 el.style.left = `${p.x}%`;
                 el.style.top = `${p.y}%`;
                 el.style.transform = 'translate(-50%, -50%)';
                 el.dataset.id = p.id;
 
                 el.innerHTML = `
-                    <div class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm shadow-xl border-2 border-amber-400/80 transition transform group-hover:scale-105"
+                    <div onclick="handlePlayerClick('${p.id}', 'pitch')" class="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm shadow-xl border-2 border-amber-400/80 transition transform group-hover:scale-105"
                          style="background-color: ${kitColor}; color: ${kitAccent};">
                         <i class="fa-solid fa-dragon absolute -inset-1 opacity-25"></i>
                         <span class="relative z-10">${p.number}</span>
                     </div>
-                    <div class="mt-1 bg-[#090a0f]/95 border border-red-900/50 px-2 py-0.5 rounded shadow text-center backdrop-blur-sm pointer-events-auto">
-                        <input type="text" value="${p.name}" data-id="${p.id}" class="player-name-input bg-transparent text-[10px] sm:text-xs font-bold text-amber-200 w-20 sm:w-24 text-center focus:outline-none focus:bg-[#131b2e] rounded px-1" title="Click to edit name">
+                    <div class="mt-1 bg-[#090a0f]/95 border border-red-900/50 px-1.5 py-0.5 rounded shadow text-center backdrop-blur-sm pointer-events-auto">
+                        <input type="text" value="${p.name}" data-id="${p.id}" class="player-name-input bg-transparent text-[10px] sm:text-xs font-bold text-amber-200 w-18 sm:w-22 text-center focus:outline-none focus:bg-[#131b2e] rounded px-0.5" title="Click to edit name">
                     </div>
                 `;
 
@@ -424,77 +430,104 @@
                     if (player) player.name = e.target.value;
                 });
             });
-
-            renderBench();
         }
 
-        // Render substitutes bench
-        function renderBench() {
-            const container = document.getElementById('benchContainer');
-            container.innerHTML = '';
+        // Render Substitutes & Bench lists
+        function renderSubsAndBench() {
+            // Render Substitutes (4)
+            const subsContainer = document.getElementById('subsContainer');
+            subsContainer.innerHTML = '';
+            substitutes.forEach(sub => {
+                const item = document.createElement('div');
+                item.className = `flex items-center justify-between p-2 rounded-xl border transition cursor-pointer ${selectedPlayer?.id === sub.id ? 'bg-amber-950/40 border-amber-500' : 'bg-[#161d2e] hover:bg-[#1c263b] border-amber-500/20'}`;
+                item.innerHTML = `
+                    <div class="flex items-center gap-2" onclick="handlePlayerClick('${sub.id}', 'sub')">
+                        <span class="w-6 h-6 rounded-full bg-amber-950 border border-amber-600 flex items-center justify-center text-xs font-bold text-amber-300">${sub.number}</span>
+                        <input type="text" value="${sub.name}" onchange="updatePlayerName('${sub.id}', 'sub', this.value)" class="bg-transparent text-xs text-amber-100 font-semibold focus:outline-none w-28">
+                    </div>
+                    <button onclick="handlePlayerClick('${sub.id}', 'sub')" class="text-xs bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white px-2 py-1 rounded transition">
+                        Swap
+                    </button>
+                `;
+                subsContainer.appendChild(item);
+            });
 
-            if (substitutes.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-2">All squad members are on the pitch</p>`;
+            // Render Bench
+            const benchContainer = document.getElementById('benchContainer');
+            benchContainer.innerHTML = '';
+            document.getElementById('benchCount').innerText = bench.length;
+
+            if (bench.length === 0) {
+                benchContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-2">No players on bench</p>`;
                 return;
             }
 
-            substitutes.forEach((sub) => {
+            bench.forEach(b => {
                 const item = document.createElement('div');
-                item.className = 'flex items-center justify-between bg-[#161d2e] hover:bg-[#1c263b] p-2 rounded-xl border border-red-900/20 transition';
+                item.className = `flex items-center justify-between p-2 rounded-xl border transition cursor-pointer ${selectedPlayer?.id === b.id ? 'bg-red-950/40 border-red-500' : 'bg-[#161d2e] hover:bg-[#1c263b] border-red-900/20'}`;
                 item.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded-full bg-red-950 border border-red-800 flex items-center justify-center text-xs font-bold text-amber-300">${sub.number}</span>
-                        <input type="text" value="${sub.name}" onchange="updateSubName('${sub.id}', this.value)" class="bg-transparent text-xs text-slate-200 font-semibold focus:outline-none w-28 sm:w-36">
+                    <div class="flex items-center gap-2" onclick="handlePlayerClick('${b.id}', 'bench')">
+                        <span class="w-6 h-6 rounded-full bg-red-950 border border-red-800 flex items-center justify-center text-xs font-bold text-slate-300">${b.number}</span>
+                        <input type="text" value="${b.name}" onchange="updatePlayerName('${b.id}', 'bench', this.value)" class="bg-transparent text-xs text-slate-200 font-semibold focus:outline-none w-28">
                     </div>
-                    <div class="flex items-center gap-1">
-                        <button onclick="swapSubToPitch('${sub.id}')" title="Bring onto Pitch" class="bg-red-900/40 hover:bg-red-700 text-amber-300 hover:text-white px-2 py-1 rounded text-xs transition">
-                            <i class="fa-solid fa-arrow-up"></i>
-                        </button>
-                        <button onclick="removeSub('${sub.id}')" title="Remove" class="text-slate-500 hover:text-red-400 px-1.5 py-1 rounded text-xs transition">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
+                    <button onclick="handlePlayerClick('${b.id}', 'bench')" class="text-xs bg-red-900/30 hover:bg-red-700 text-red-300 hover:text-white px-2 py-1 rounded transition">
+                        Swap
+                    </button>
                 `;
-                container.appendChild(item);
+                benchContainer.appendChild(item);
             });
         }
 
-        function removeSub(id) {
-            substitutes = substitutes.filter(s => s.id !== id);
-            renderBench();
+        // Click-to-Swap Mechanism between Pitch, Subs, and Bench
+        function handlePlayerClick(id, category) {
+            let clickedPlayer = null;
+            if (category === 'pitch') clickedPlayer = players.find(p => p.id === id);
+            else if (category === 'sub') clickedPlayer = substitutes.find(s => s.id === id);
+            else if (category === 'bench') clickedPlayer = bench.find(b => b.id === id);
+
+            if (!selectedPlayer) {
+                selectedPlayer = { ...clickedPlayer, category };
+                renderAll();
+            } else {
+                if (selectedPlayer.id === clickedPlayer.id) {
+                    // Deselect if clicked again
+                    selectedPlayer = null;
+                    renderAll();
+                    return;
+                }
+
+                // Perform Swap of Names & Roles (keeping positions & numbers fixed)
+                let sourceObj = findPlayerObj(selectedPlayer.id, selectedPlayer.category);
+                let targetObj = findPlayerObj(clickedPlayer.id, category);
+
+                if (sourceObj && targetObj) {
+                    const tempName = sourceObj.name;
+                    sourceObj.name = targetObj.name;
+                    targetObj.name = tempName;
+                }
+
+                selectedPlayer = null;
+                renderAll();
+            }
         }
 
-        function updateSubName(id, val) {
-            const sub = substitutes.find(s => s.id === id);
-            if (sub) sub.name = val;
+        function findPlayerObj(id, category) {
+            if (category === 'pitch') return players.find(p => p.id === id);
+            if (category === 'sub') return substitutes.find(s => s.id === id);
+            if (category === 'bench') return bench.find(b => b.id === id);
+            return null;
         }
 
-        function swapSubToPitch(subId) {
-            if (players.length === 0) return;
-            const subIndex = substitutes.findIndex(s => s.id === subId);
-            if (subIndex === -1) return;
-            const sub = substitutes[subIndex];
-
-            // Swap with first player on pitch
-            const targetPlayer = players[0];
-            substitutes[subIndex] = {
-                id: targetPlayer.id,
-                number: targetPlayer.number,
-                name: targetPlayer.name,
-                position: 'SUB'
-            };
-
-            targetPlayer.number = sub.number;
-            targetPlayer.name = sub.name;
-
-            renderPitchPlayers();
+        function updatePlayerName(id, category, val) {
+            const obj = findPlayerObj(id, category);
+            if (obj) obj.name = val;
         }
 
         function updateKitColors() {
             renderPitchPlayers();
         }
 
-        // Drag and drop implementation
+        // Drag and drop implementation for pitch tokens
         function setupDragAndDrop(element, playerObj) {
             const pitch = document.getElementById('footballPitch');
             let isDragging = false;
@@ -579,7 +612,7 @@
         function shareToWhatsApp() {
             const teamName = document.getElementById('teamNameInput').value || 'Dracarys';
             const note = document.getElementById('tacticalNote').value || `Formation: ${currentSquadSize}-a-side (${currentFormationKey})`;
-            const text = encodeURIComponent(`🔥 *${teamName} FC* - Fire & Blood Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}\n\nBuilt with TacticBoard FC`);
+            const text = encodeURIComponent(`🔥 *${teamName} FC* - End-to-End Tactics (${currentSquadSize}v${currentSquadSize})\n📌 ${note}\n\nBuilt with TacticBoard FC`);
             window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
         }
     </script>
